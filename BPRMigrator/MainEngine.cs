@@ -8,7 +8,7 @@ namespace BPRMigrator
 {
     public static class MainEngine
     {
-        public static IEnumerable<string> GetProjectFiles(string fileName, string elementName, string attributeName)
+        public static IEnumerable<string> GetProjectFiles(string fileName, string elementName, string attributeName, string[] excludeExtensions = null)
         {
             var fileInfo = new FileInfo(fileName);
             string directoryName = fileInfo.DirectoryName;
@@ -37,6 +37,32 @@ namespace BPRMigrator
                     }
 
                     var info = new FileInfo(attribute.Value);
+
+                    if (excludeExtensions != null)
+                    {
+                        bool skip = false;
+
+                        foreach(string extension in excludeExtensions)
+                        {
+                            string _extension = extension.ToLower();
+
+                            if (!_extension.StartsWith("."))
+                            {
+                                _extension = ("." + _extension);
+                            }
+
+                            if (_extension == info.Extension.ToLower())
+                            {
+                                skip = true;
+                                break;
+                            }
+                        }
+
+                        if (skip)
+                        {
+                            continue;
+                        }
+                    }
 
                     if (!(info.Exists))
                     {

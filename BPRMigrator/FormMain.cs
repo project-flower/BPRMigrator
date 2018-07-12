@@ -43,7 +43,6 @@ namespace BPRMigrator
             includePathElementName = Resources.IncludePathElementName;
             libPathElementName = Resources.LibPathElementName;
             macrosElementName = Resources.MacrosElementName;
-            Icon.Save(new FileStream(".\\BPRMigrator.ico", FileMode.CreateNew, FileAccess.Write));
         }
 
         private void fileSelector_SelectedFileChanged(object sender, EventArgs e)
@@ -103,7 +102,19 @@ namespace BPRMigrator
 
             try
             {
-                fileNames = MainEngine.GetProjectFiles(selectedFile, fileListElementName, fileNameElementName).ToArray();
+                var excludeExtensions = new List<string>();
+
+                if (checkBoxExcludeBpfFile.Checked)
+                {
+                    excludeExtensions.Add(".bpf");
+                }
+
+                if (checkBoxExcludeResFile.Checked)
+                {
+                    excludeExtensions.Add(".res");
+                }
+
+                fileNames = MainEngine.GetProjectFiles(selectedFile, fileListElementName, fileNameElementName, excludeExtensions.ToArray()).ToArray();
             }
             catch (Exception exception)
             {
