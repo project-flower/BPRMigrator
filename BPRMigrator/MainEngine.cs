@@ -8,76 +8,6 @@ namespace BPRMigrator
 {
     public static class MainEngine
     {
-        public static IEnumerable<string> GetProjectFiles(string fileName, string elementName, string attributeName, string[] excludeExtensions = null)
-        {
-            var fileInfo = new FileInfo(fileName);
-            string directoryName = fileInfo.DirectoryName;
-            var document = new XmlDocument();
-            document.Load(fileName);
-            XmlElement element = document.DocumentElement[elementName];
-
-            if (element == null)
-            {
-                throw new Exception(elementName + " 要素が見つかりません。");
-            }
-
-            string currentDirectory = Directory.GetCurrentDirectory();
-
-            try
-            {
-                Directory.SetCurrentDirectory(fileInfo.DirectoryName);
-
-                foreach (XmlNode node in element.ChildNodes)
-                {
-                    XmlAttribute attribute = node.Attributes[attributeName];
-
-                    if (attribute == null)
-                    {
-                        throw new Exception(node.OuterXml + "\r\n" + attributeName + " 属性が見つかりません。");
-                    }
-
-                    var info = new FileInfo(attribute.Value);
-
-                    if (excludeExtensions != null)
-                    {
-                        bool skip = false;
-
-                        foreach(string extension in excludeExtensions)
-                        {
-                            string _extension = extension.ToLower();
-
-                            if (!_extension.StartsWith("."))
-                            {
-                                _extension = ("." + _extension);
-                            }
-
-                            if (_extension == info.Extension.ToLower())
-                            {
-                                skip = true;
-                                break;
-                            }
-                        }
-
-                        if (skip)
-                        {
-                            continue;
-                        }
-                    }
-
-                    if (!(info.Exists))
-                    {
-                        throw new FileNotFoundException(info.FullName + " が見つかりません。");
-                    }
-
-                    yield return info.FullName;
-                }
-            }
-            finally
-            {
-                Directory.SetCurrentDirectory(currentDirectory);
-            }
-        }
-
         public static string GetFormattedPaths(string fileName, string element1Name, string element2Name)
         {
             string[] paths = getPaths(fileName, element1Name, element2Name);
@@ -115,6 +45,76 @@ namespace BPRMigrator
             }
 
             return builder.ToString();
+        }
+
+        public static IEnumerable<string> GetProjectFiles(string fileName, string elementName, string attributeName, string[] excludeExtensions = null)
+        {
+            var fileInfo = new FileInfo(fileName);
+            string directoryName = fileInfo.DirectoryName;
+            var document = new XmlDocument();
+            document.Load(fileName);
+            XmlElement element = document.DocumentElement[elementName];
+
+            if (element == null)
+            {
+                throw new Exception(elementName + " 要素が見つかりません。");
+            }
+
+            string currentDirectory = Directory.GetCurrentDirectory();
+
+            try
+            {
+                Directory.SetCurrentDirectory(fileInfo.DirectoryName);
+
+                foreach (XmlNode node in element.ChildNodes)
+                {
+                    XmlAttribute attribute = node.Attributes[attributeName];
+
+                    if (attribute == null)
+                    {
+                        throw new Exception(node.OuterXml + "\r\n" + attributeName + " 属性が見つかりません。");
+                    }
+
+                    var info = new FileInfo(attribute.Value);
+
+                    if (excludeExtensions != null)
+                    {
+                        bool skip = false;
+
+                        foreach (string extension in excludeExtensions)
+                        {
+                            string _extension = extension.ToLower();
+
+                            if (!_extension.StartsWith("."))
+                            {
+                                _extension = ("." + _extension);
+                            }
+
+                            if (_extension == info.Extension.ToLower())
+                            {
+                                skip = true;
+                                break;
+                            }
+                        }
+
+                        if (skip)
+                        {
+                            continue;
+                        }
+                    }
+
+                    if (!(info.Exists))
+                    {
+                        throw new FileNotFoundException(info.FullName + " が見つかりません。");
+                    }
+
+                    yield return info.FullName;
+                }
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(currentDirectory);
+            }
         }
 
         private static string[] getPaths(string fileName, string element1Name, string element2Name)
