@@ -45,6 +45,16 @@ namespace BPRMigrator
             macrosElementName = Resources.MacrosElementName;
         }
 
+        private void buttonCopyIncludePath_Click(object sender, EventArgs e)
+        {
+            setTextToClipboard(textBoxIncludePath.Text);
+        }
+
+        private void buttonCopyLibPath_Click(object sender, EventArgs e)
+        {
+            setTextToClipboard(textBoxLibPath.Text);
+        }
+
         private void fileSelector_SelectedFileChanged(object sender, EventArgs e)
         {
             string fileName;
@@ -123,16 +133,6 @@ namespace BPRMigrator
             }
 
             DragDropEffects effect = listView.DoDragDrop(new DataObject(DataFormats.FileDrop, fileNames), DragDropEffects.All);
-        }
-
-        private void buttonCopyIncludePath_Click(object sender, EventArgs e)
-        {
-            setTextToClipboard(textBoxIncludePath.Text);
-        }
-
-        private void buttonCopyLibPath_Click(object sender, EventArgs e)
-        {
-            setTextToClipboard(textBoxLibPath.Text);
         }
     }
 }
