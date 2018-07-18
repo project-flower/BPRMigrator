@@ -104,5 +104,14 @@ namespace BPRMigrator.Properties {
                 return ResourceManager.GetString("MacrosElementName", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   USERDEFINES に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string UserDefinesElementName {
+            get {
+                return ResourceManager.GetString("UserDefinesElementName", resourceCulture);
+            }
+        }
     }
 }

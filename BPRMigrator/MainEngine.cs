@@ -8,6 +8,34 @@ namespace BPRMigrator
 {
     public static class MainEngine
     {
+        public static string GetElementValue(string fileName, string element1Name, string element2Name)
+        {
+            var document = new XmlDocument();
+            document.Load(fileName);
+            XmlElement element = document.DocumentElement[element1Name];
+
+            if (element == null)
+            {
+                throw new Exception(element1Name + " 要素が見つかりません。");
+            }
+
+            XmlNodeList nodes = element.GetElementsByTagName(element2Name);
+
+            if ((nodes == null) || (nodes.Count < 1))
+            {
+                throw new Exception(element2Name + " 要素が見つかりません。");
+            }
+
+            XmlAttribute attributes = nodes[0].Attributes["value"];
+
+            if (attributes == null)
+            {
+                throw new Exception(nodes[0].OuterXml + "\r\n" + " VALUE 属性が見つかりません。");
+            }
+
+            return attributes.Value;
+        }
+
         public static string GetFormattedPaths(string fileName, string element1Name, string element2Name)
         {
             string[] paths = getPaths(fileName, element1Name, element2Name);
@@ -119,30 +147,8 @@ namespace BPRMigrator
 
         private static string[] getPaths(string fileName, string element1Name, string element2Name)
         {
-            var document = new XmlDocument();
-            document.Load(fileName);
-            XmlElement element = document.DocumentElement[element1Name];
-
-            if (element == null)
-            {
-                throw new Exception(element1Name + " 要素が見つかりません。");
-            }
-
-            XmlNodeList nodes = element.GetElementsByTagName(element2Name);
-
-            if ((nodes == null) || (nodes.Count < 1))
-            {
-                throw new Exception(element2Name + " 要素が見つかりません。");
-            }
-
-            XmlAttribute attributes = nodes[0].Attributes["value"];
-
-            if (attributes == null)
-            {
-                throw new Exception(nodes[0].OuterXml + "\r\n" + " VALUE 属性が見つかりません。");
-            }
-
-            string values = attributes.Value.Replace("\"", string.Empty).Replace("$(BCB)", "$(BDS)");
+            string elementValue = GetElementValue(fileName, element1Name, element2Name);
+            string values = elementValue.Replace("\"", string.Empty).Replace("$(BCB)", "$(BDS)");
             string[] columns = values.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
             return columns;
         }

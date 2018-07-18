@@ -9,11 +9,14 @@ namespace BPRMigrator
 {
     public partial class FormMain : Form
     {
+        private delegate void DoAnything();
+
         private readonly string fileListElementName;
         private readonly string fileNameElementName;
         private readonly string includePathElementName;
         private readonly string libPathElementName;
         private readonly string macrosElementName;
+        private readonly string userDefinesElementName;
 
         private void setTextToClipboard(string text)
         {
@@ -33,6 +36,19 @@ namespace BPRMigrator
             MessageBox.Show(message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
+        private void tryAndCatch<T>(DoAnything action)
+            where T : Exception
+        {
+            try
+            {
+                action();
+            }
+            catch (T exception)
+            {
+                showErrorMessage(exception.Message);
+            }
+        }
+
         public FormMain()
         {
             InitializeComponent();
@@ -43,6 +59,7 @@ namespace BPRMigrator
             includePathElementName = Resources.IncludePathElementName;
             libPathElementName = Resources.LibPathElementName;
             macrosElementName = Resources.MacrosElementName;
+            userDefinesElementName = Resources.UserDefinesElementName;
         }
 
         private void buttonCopyIncludePath_Click(object sender, EventArgs e)
@@ -53,6 +70,11 @@ namespace BPRMigrator
         private void buttonCopyLibPath_Click(object sender, EventArgs e)
         {
             setTextToClipboard(textBoxLibPath.Text);
+        }
+
+        private void buttonCopyUserDefines_Click(object sender, EventArgs e)
+        {
+            setTextToClipboard(textBoxUserDefines.Text);
         }
 
         private void fileSelector_SelectedFileChanged(object sender, EventArgs e)
@@ -80,23 +102,20 @@ namespace BPRMigrator
                 return;
             }
 
-            try
+            tryAndCatch<Exception>(delegate ()
             {
                 textBoxIncludePath.Text = MainEngine.GetFormattedPaths(fileName, macrosElementName, includePathElementName);
-            }
-            catch (Exception exception)
-            {
-                showErrorMessage(exception.Message);
-            }
+            });
 
-            try
+            tryAndCatch<Exception>(delegate ()
             {
                 textBoxLibPath.Text = MainEngine.GetFormattedPaths(fileName, macrosElementName, libPathElementName);
-            }
-            catch (Exception exception)
+            });
+
+            tryAndCatch<Exception>(delegate ()
             {
-                showErrorMessage(exception.Message);
-            }
+                textBoxUserDefines.Text = MainEngine.GetElementValue(fileName, macrosElementName, userDefinesElementName);
+            });
         }
 
         private void listView_ItemDrag(object sender, ItemDragEventArgs e)

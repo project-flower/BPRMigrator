@@ -132,4 +132,7 @@
   <data name="MacrosElementName" xml:space="preserve">
     <value>MACROS</value>
   </data>
+  <data name="UserDefinesElementName" xml:space="preserve">
+    <value>USERDEFINES</value>
+  </data>
 </root>
